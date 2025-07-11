@@ -1,0 +1,33 @@
+{
+  "name": "@noumenadigital/create-npl",
+  "version": "1.0.0",
+  "description": "Create NPL frontend projects with a single command",
+  "bin": {
+    "create-npl": "./bin/create-npl.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "npl",
+    "frontend",
+    "scaffold",
+    "init"
+  ],
+  "author": "Noumena Digital",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noumenadigital/create-npl-frontend.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "fs-extra": "^11.3.0",
+    "inquirer": "^12.7.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "type": "module"
+} 
