@@ -1,6 +1,6 @@
 {
     "name": "@noumenadigital/create-npl",
-    "private": true,
+    "private": false,
     "version": "0.0.1",
     "description": "A CLI to create a new NPL frontend project",
     "main": "dist/index.js",
