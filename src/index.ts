@@ -25,13 +25,13 @@ async function main() {
             })
             .option('tenant', {
               alias: 't',
-              describe: 'The tenant name',
+              describe: 'The tenant slug',
               type: 'string',
               demandOption: true,
             })
             .option('app', {
               alias: 'a',
-              describe: 'The application name',
+              describe: 'The application slug',
               type: 'string',
               demandOption: true,
             })
