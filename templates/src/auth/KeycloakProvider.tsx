@@ -1,19 +1,19 @@
 import Keycloak from 'keycloak-js'
 import React, { FC } from 'react'
 import { ReactKeycloakProvider } from '@react-keycloak/web'
-import { useRuntimeConfiguration } from './RuntimeConfigurationProvider.tsx'
+import { useRuntimeConfiguration } from '../RuntimeConfigurationProvider'
 
 interface KeycloakProviderProps {
     children: React.ReactNode
 }
 
 export const KeycloakProvider: FC<KeycloakProviderProps> = ({ children }) => {
-    const { keycloakUrl, keycloakRealm } = useRuntimeConfiguration()
+    const { authUrl, realm, clientId } = useRuntimeConfiguration()
 
     const keycloak = new Keycloak({
-        url: keycloakUrl,
-        realm: keycloakRealm,
-        clientId: keycloakRealm
+        url: authUrl,
+        realm: realm || '',
+        clientId: clientId || ''
     })
 
     const initOptions = {

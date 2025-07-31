@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useRuntimeConfiguration } from './RuntimeConfigurationProvider.tsx'
+import { useRuntimeConfiguration } from './RuntimeConfigurationProvider'
 import { useKeycloak } from '@react-keycloak/web'
+import { useDirectOidc } from './auth/DirectOidcProvider'
 import { Box, CircularProgress } from '@mui/material'
 import { KeycloakTokenParsed } from 'keycloak-js'
 
@@ -24,15 +25,41 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-    const { apiBaseUrl } = useRuntimeConfiguration()
-    const { keycloak, initialized } = useKeycloak()
+    const { apiBaseUrl, loginMode } = useRuntimeConfiguration()
     const [user, setUser] = useState<User | null>(null)
 
+    // Keycloak hooks (only used in KEYCLOAK mode)
+    let keycloak, initialized
+    try {
+        const keycloakAuth = useKeycloak()
+        keycloak = keycloakAuth.keycloak
+        initialized = keycloakAuth.initialized
+    } catch {
+        // Not in Keycloak context
+        keycloak = null
+        initialized = false
+    }
+
+    // DirectOidc hooks (only used in CUSTOM_OIDC mode)
+    let directOidcAuth
+    try {
+        directOidcAuth = useDirectOidc()
+    } catch {
+        // Not in DirectOidc context
+        directOidcAuth = null
+    }
+
     useEffect(() => {
-        if (initialized && keycloak.tokenParsed) {
-            internalizeUser(keycloak.tokenParsed).then((it) => setUser(it))
+        if (loginMode === 'KEYCLOAK') {
+            if (initialized && keycloak?.tokenParsed) {
+                internalizeUser(keycloak.tokenParsed).then((it) => setUser(it))
+            }
+        } else if (loginMode === 'CUSTOM_OIDC') {
+            if (directOidcAuth?.isAuthenticated && directOidcAuth.user) {
+                setUser(directOidcAuth.user)
+            }
         }
-    }, [apiBaseUrl, keycloak, initialized])
+    }, [apiBaseUrl, keycloak, initialized, directOidcAuth, loginMode])
 
     return (
         <UserContext.Provider value={user}>

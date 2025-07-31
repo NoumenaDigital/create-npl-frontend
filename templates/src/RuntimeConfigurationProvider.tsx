@@ -1,9 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
+type LoginMode = 'KEYCLOAK' | 'CUSTOM_OIDC' | 'DEV_MODE'
+type DeploymentTarget = 'LOCAL' | 'NOUMENA_CLOUD'
+
 export interface RuntimeConfiguration {
     apiBaseUrl: string
-    keycloakUrl: string
-    keycloakRealm: string
+    authUrl: string
+    realm: string | undefined
+    clientId: string | undefined
+    loginMode: LoginMode
+    deploymentTarget: DeploymentTarget
 }
 
 const RuntimeConfigurationContext = createContext<RuntimeConfiguration | null>(
@@ -23,22 +29,79 @@ interface RuntimeConfigurationProviderProps {
 }
 
 /**
- * Loads runtime configuration from static file (in /public folder).
+ * Loads runtime configuration from environment variables.
  */
 export const loadRuntimeConfiguration =
     async (): Promise<RuntimeConfiguration> => {
-        const config_file = '/config-noumena-cloud.json'
-        const response = await fetch(config_file)
-        const value = await response.json()
+        const loginMode =
+            (import.meta.env.VITE_LOGIN_MODE as LoginMode) || 'CUSTOM_OIDC'
+        const deploymentTarget =
+            (import.meta.env.VITE_DEPLOYMENT_TARGET as DeploymentTarget) || 'LOCAL'
 
-        let config = {
-            apiBaseUrl: value.API_BASE_URL,
-            keycloakUrl: value.KEYCLOAK_URL,
-            keycloakRealm: value.KEYCLOAK_REALM
+        const config_file = '/config-noumena-cloud.json'
+        const cloud_config = await fetch(config_file).then(response => response.json()).catch(() => {
+            console.error('No cloud config found: /config-noumena-cloud.json')
+        })
+
+        const appSlug = import.meta.env.VITE_NC_APP_NAME
+        const tenantSlug = import.meta.env.VITE_NC_ORG_NAME
+
+        let config: RuntimeConfiguration = {
+            apiBaseUrl: 'http://localhost:12000',
+            authUrl: 'http://localhost:11000',
+            realm: '',
+            clientId: '',
+            loginMode,
+            deploymentTarget
         }
+
+        if (deploymentTarget === 'NOUMENA_CLOUD') {
+            config.apiBaseUrl = cloud_config?.API_BASE_URL ||
+                import.meta.env.VITE_CLOUD_API_URL ||
+                `https://engine-${tenantSlug}-${appSlug}.noumena.cloud`
+        } else {
+            config.apiBaseUrl =
+                import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:12000'
+        }
+
+        if (loginMode === 'DEV_MODE') {
+            config.authUrl =
+                import.meta.env.VITE_LOCAL_AUTH_URL || 'http://localhost:11000'
+        } else if (loginMode === 'CUSTOM_OIDC') {
+            if (deploymentTarget === 'NOUMENA_CLOUD') {
+                config.authUrl =
+                    (
+                        cloud_config?.KEYCLOAK_URL ||
+                        import.meta.env.VITE_CLOUD_AUTH_URL ||
+                        'http://localhost:11000') + '/protocol/openid-connect'
+            } else {
+                config.authUrl =
+                    (import.meta.env.VITE_LOCAL_AUTH_URL ||
+                        'http://localhost:11000') + '/protocol/openid-connect'
+            }
+            config.realm = appSlug
+            config.clientId = appSlug
+        } else if (loginMode === 'KEYCLOAK') {
+            if (deploymentTarget === 'NOUMENA_CLOUD') {
+                config.authUrl =
+                    cloud_config?.KEYCLOAK_URL ||
+                    import.meta.env.VITE_CLOUD_AUTH_URL ||
+                    `https://keycloak-${tenantSlug}-${appSlug}.noumena.cloud`
+            } else {
+                config.authUrl =
+                    import.meta.env.VITE_LOCAL_AUTH_URL || 'http://localhost:11000'
+            }
+            config.realm = appSlug
+            config.clientId = appSlug
+        }
+
+        console.log('Login Mode:', loginMode)
+        console.log('Deployment Target:', deploymentTarget)
+        console.log('Configuration:', config)
 
         return config
     }
+
 
 export const RuntimeConfigurationProvider: React.FC<
     RuntimeConfigurationProviderProps

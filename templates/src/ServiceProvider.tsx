@@ -3,6 +3,7 @@ import { useRuntimeConfiguration } from './RuntimeConfigurationProvider.tsx'
 import { useKeycloak } from '@react-keycloak/web'
 import { Box, CircularProgress } from '@mui/material'
 import { BaseService } from './services/BaseService.ts'
+import { useDirectOidc } from './auth/DirectOidcProvider'
 
 const ServiceContext = createContext<BaseService | null>(null)
 
@@ -21,15 +22,24 @@ interface ServiceProviderProps {
 export const ServiceProvider: React.FC<ServiceProviderProps> = ({
     children
 }) => {
-    const { apiBaseUrl } = useRuntimeConfiguration()
-    const { keycloak, initialized } = useKeycloak()
+    const { apiBaseUrl, loginMode } = useRuntimeConfiguration()
+    const isKeycloak = loginMode === 'KEYCLOAK'
+    const isDirectOidc = loginMode === 'CUSTOM_OIDC'
+    const { keycloak, initialized } = isKeycloak
+        ? useKeycloak()
+        : { keycloak: null, initialized: false }
+    const { isAuthenticated, user } = isDirectOidc
+        ? useDirectOidc()
+        : { isAuthenticated: false, user: null }
     const [services, setServices] = useState<BaseService | null>(null)
 
     useEffect(() => {
-        if (initialized && keycloak.token) {
-            setServices(new BaseService(apiBaseUrl, keycloak))
+        if (isKeycloak && initialized && keycloak!.token) {
+            setServices(new BaseService(apiBaseUrl, keycloak!))
+        } else if (isDirectOidc && isAuthenticated) {
+            setServices(new BaseService(apiBaseUrl, user!))
         }
-    }, [apiBaseUrl, keycloak, initialized])
+    }, [apiBaseUrl, keycloak, initialized, isAuthenticated, user])
 
     return (
         <ServiceContext.Provider value={services}>
