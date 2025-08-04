@@ -1,25 +1,28 @@
-import { Configuration, DefaultApi } from '../../generated'
+import { client } from '../api-client/client.gen'
+import { Client } from '../api-client/client/types'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import Keycloak from 'keycloak-js'
 import { useEffect, useState } from 'react'
+import { CustomOidc } from '../auth/CustomOidc'
 
 export class BaseService {
-    api: DefaultApi
+    client: Client
     private apiBaseUrl: string
-    private keycloak: Keycloak
+    private authProvider: Keycloak | CustomOidc
 
-    constructor(apiBaseUrl: string, keycloak: Keycloak) {
-        this.keycloak = keycloak
+    constructor(apiBaseUrl: string, authProvider: Keycloak | CustomOidc) {
+        this.authProvider = authProvider
         this.apiBaseUrl = apiBaseUrl
-        this.api = new DefaultApi(
-            new Configuration({
-                basePath: apiBaseUrl
-            })
-        )
+        this.client = client
+        this.client.setConfig({
+            baseUrl: apiBaseUrl
+        })
     }
 
     withAuthorizationHeader = () => {
-        return { headers: { Authorization: `Bearer ${this.keycloak.token}` } }
+        return {
+            headers: { Authorization: `Bearer ${this.authProvider.token}` }
+        }
     }
 
     public useStateStream = (requestRefresh: () => void) => {
