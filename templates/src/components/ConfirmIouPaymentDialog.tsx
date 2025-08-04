@@ -18,7 +18,7 @@ export const ConfirmIouPaymentDialog: React.FC<{
     open: boolean
     onClose: (_: boolean) => void
 }> = ({ iouId, open, onClose }) => {
-    const { api, withAuthorizationHeader } = useServices()
+    const { client, withAuthorizationHeader } = useServices()
 
     const [iou, setIou] = useState<Iou>()
     const valid = true
@@ -26,18 +26,18 @@ export const ConfirmIouPaymentDialog: React.FC<{
     useEffect(() => {
         if (iouId && iouId !== '') {
             getIouById({
-                client: api,
+                client,
                 path: {
                     id: iouId
                 },
                 ...withAuthorizationHeader()
             }).then((it) => setIou(it.data))
         }
-    }, [api, withAuthorizationHeader, iouId])
+    }, [client, withAuthorizationHeader, iouId])
 
-    const confirmAction = async () => {
-        await iouConfirmPayment({
-            client: api,
+    const confirmAction = () => {
+        iouConfirmPayment({
+            client,
             path: {
                 id: iouId
             },

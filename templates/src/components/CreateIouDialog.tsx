@@ -19,15 +19,15 @@ export const CreateIouDialog: React.FC<{
     onClose: (_: boolean) => void
 }> = ({ open, onClose }) => {
     const user = useMe()
-    const { api, withAuthorizationHeader } = useServices()
+    const { client, withAuthorizationHeader } = useServices()
     const [description, setDescription] = useState<string>('')
     const [payee, setPayee] = useState<string>('')
     const [forAmount, setForAmount] = useState<number>()
 
     const [valid, setValid] = useState(false)
 
-    const create = async () => {
-        await createIou({
+    const create = () => {
+        createIou({
             body: {
                 description: description,
                 forAmount: forAmount || 0,
@@ -47,7 +47,7 @@ export const CreateIouDialog: React.FC<{
                 }
             },
             method: 'POST',
-            client: api,
+            client,
             ...withAuthorizationHeader()
         }).then(() => onClose(true))
     }

@@ -19,7 +19,7 @@ export const RepayIouDialog: React.FC<{
     open: boolean
     onClose: (_: boolean) => void
 }> = ({ iouId, open, onClose }) => {
-    const { api, withAuthorizationHeader } = useServices()
+    const { client, withAuthorizationHeader } = useServices()
 
     const [iou, setIou] = useState<Iou>()
 
@@ -29,18 +29,18 @@ export const RepayIouDialog: React.FC<{
     useEffect(() => {
         if (iouId && iouId !== '') {
             getIouById({
-                client: api,
+                client,
                 path: {
                     id: iouId
                 },
                 ...withAuthorizationHeader()
             }).then((it) => setIou(it.data))
         }
-    }, [api, withAuthorizationHeader, iouId])
+    }, [client, withAuthorizationHeader, iouId])
 
     const payAction = async () => {
         await iouPay({
-            client: api,
+            client,
             path: {
                 id: iouId
             },

@@ -39,12 +39,12 @@ export const HomePage = () => {
             iouId: ''
         })
 
-    const { api, withAuthorizationHeader, useStateStream } = useServices()
+    const { client, withAuthorizationHeader, useStateStream } = useServices()
 
     const [iouList, setIouList] = useState<Iou[]>()
     const active = useStateStream(() =>
         getIouList({
-            client: api,
+            client,
             ...withAuthorizationHeader()
         }).then((it) => setIouList(it.data?.items))
     )
@@ -52,7 +52,7 @@ export const HomePage = () => {
     useEffect(() => {
         if (!createIouDialogOpen && !repayIouDialogOpen.open) {
             getIouList({
-                client: api,
+                client,
                 ...withAuthorizationHeader()
             }).then((it) => setIouList(it.data?.items))
         }
@@ -61,7 +61,7 @@ export const HomePage = () => {
         repayIouDialogOpen.open,
         confirmIouPaymentDialogOpen.open,
         active,
-        api,
+        client,
         withAuthorizationHeader
     ])
 

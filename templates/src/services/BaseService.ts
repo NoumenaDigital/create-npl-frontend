@@ -6,15 +6,15 @@ import { useEffect, useState } from 'react'
 import { CustomOidc } from '../auth/CustomOidc'
 
 export class BaseService {
-    api: Client
+    client: Client
     private apiBaseUrl: string
     private authProvider: Keycloak | CustomOidc
 
     constructor(apiBaseUrl: string, authProvider: Keycloak | CustomOidc) {
         this.authProvider = authProvider
         this.apiBaseUrl = apiBaseUrl
-        this.api = client
-        this.api.setConfig({
+        this.client = client
+        this.client.setConfig({
             baseUrl: apiBaseUrl
         })
     }
