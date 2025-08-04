@@ -4,7 +4,7 @@ import './index.css'
 import { CssBaseline } from '@mui/material'
 import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider'
-import { RuntimeConfigurationProvider } from './RuntimeConfigurationProvider'
+import { ConfigurationProvider } from './ConfigurationProvider.tsx'
 import { ServiceProvider } from './ServiceProvider'
 import { UserProvider } from './UserProvider'
 import { router } from './Router.tsx'
@@ -19,7 +19,7 @@ export const IouApp = () => {
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <RuntimeConfigurationProvider>
+    <ConfigurationProvider>
         <AuthProvider>
             <ServiceProvider>
                 <UserProvider>
@@ -27,5 +27,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </UserProvider>
             </ServiceProvider>
         </AuthProvider>
-    </RuntimeConfigurationProvider>
+    </ConfigurationProvider>
 )

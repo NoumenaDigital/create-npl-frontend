@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { KeycloakProvider } from './KeycloakProvider'
 import { DirectOidcProvider } from './DirectOidcProvider'
-import { useRuntimeConfiguration } from '../RuntimeConfigurationProvider'
+import { useRuntimeConfiguration } from '../ConfigurationProvider'
 
 interface AuthProviderProps {
     children: React.ReactNode

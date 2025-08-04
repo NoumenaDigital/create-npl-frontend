@@ -8,7 +8,7 @@ import {
     Typography,
     Alert
 } from '@mui/material'
-import { useRuntimeConfiguration } from '../RuntimeConfigurationProvider'
+import { useRuntimeConfiguration } from '../ConfigurationProvider'
 import { jwtDecode } from 'jwt-decode'
 import { CustomOidc } from './CustomOidc'
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useRuntimeConfiguration } from './RuntimeConfigurationProvider'
+import { useRuntimeConfiguration } from './ConfigurationProvider'
 import { useKeycloak } from '@react-keycloak/web'
 import { useDirectOidc } from './auth/DirectOidcProvider'
 import { Box, CircularProgress } from '@mui/material'

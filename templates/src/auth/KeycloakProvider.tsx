@@ -1,7 +1,7 @@
 import Keycloak from 'keycloak-js'
 import React, { FC } from 'react'
 import { ReactKeycloakProvider } from '@react-keycloak/web'
-import { useRuntimeConfiguration } from '../RuntimeConfigurationProvider'
+import { useRuntimeConfiguration } from '../ConfigurationProvider'
 
 interface KeycloakProviderProps {
     children: React.ReactNode

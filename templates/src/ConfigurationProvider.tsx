@@ -12,36 +12,30 @@ export interface RuntimeConfiguration {
     deploymentTarget: DeploymentTarget
 }
 
-const RuntimeConfigurationContext = createContext<RuntimeConfiguration | null>(
+const ConfigurationContext = createContext<RuntimeConfiguration | null>(
     null
 )
 
 export const useRuntimeConfiguration = (): RuntimeConfiguration => {
-    const configuration = useContext(RuntimeConfigurationContext)
+    const configuration = useContext(ConfigurationContext)
     if (!configuration) {
         throw new Error('Configuration not loaded')
     }
     return configuration
 }
 
-interface RuntimeConfigurationProviderProps {
+interface ConfigurationProviderProps {
     children: React.ReactNode
 }
 
 /**
  * Loads runtime configuration from environment variables.
  */
-export const loadRuntimeConfiguration =
-    async (): Promise<RuntimeConfiguration> => {
+export const loadConfiguration = () => {
         const loginMode =
             (import.meta.env.VITE_LOGIN_MODE as LoginMode) || 'CUSTOM_OIDC'
         const deploymentTarget =
             (import.meta.env.VITE_DEPLOYMENT_TARGET as DeploymentTarget) || 'LOCAL'
-
-        const config_file = '/config-noumena-cloud.json'
-        const cloud_config = await fetch(config_file).then(response => response.json()).catch(() => {
-            console.error('No cloud config found: /config-noumena-cloud.json')
-        })
 
         const appSlug = import.meta.env.VITE_NC_APP_NAME
         const tenantSlug = import.meta.env.VITE_NC_ORG_NAME
@@ -56,8 +50,7 @@ export const loadRuntimeConfiguration =
         }
 
         if (deploymentTarget === 'NOUMENA_CLOUD') {
-            config.apiBaseUrl = cloud_config?.API_BASE_URL ||
-                import.meta.env.VITE_CLOUD_API_URL ||
+            config.apiBaseUrl = import.meta.env.VITE_CLOUD_API_URL ||
                 `https://engine-${tenantSlug}-${appSlug}.noumena.cloud`
         } else {
             config.apiBaseUrl =
@@ -71,7 +64,6 @@ export const loadRuntimeConfiguration =
             if (deploymentTarget === 'NOUMENA_CLOUD') {
                 config.authUrl =
                     (
-                        cloud_config?.KEYCLOAK_URL ||
                         import.meta.env.VITE_CLOUD_AUTH_URL ||
                         'http://localhost:11000') + '/protocol/openid-connect'
             } else {
@@ -84,7 +76,6 @@ export const loadRuntimeConfiguration =
         } else if (loginMode === 'KEYCLOAK') {
             if (deploymentTarget === 'NOUMENA_CLOUD') {
                 config.authUrl =
-                    cloud_config?.KEYCLOAK_URL ||
                     import.meta.env.VITE_CLOUD_AUTH_URL ||
                     `https://keycloak-${tenantSlug}-${appSlug}.noumena.cloud`
             } else {
@@ -103,23 +94,23 @@ export const loadRuntimeConfiguration =
     }
 
 
-export const RuntimeConfigurationProvider: React.FC<
-    RuntimeConfigurationProviderProps
+export const ConfigurationProvider: React.FC<
+    ConfigurationProviderProps
 > = ({ children }) => {
     const [runtimeConfig, setRuntimeConfig] =
         useState<RuntimeConfiguration | null>(null)
 
     useEffect(() => {
-        const loadConfig = async () => {
-            const loadedConfig = await loadRuntimeConfiguration()
+        const loadConfig = () => {
+            const loadedConfig = loadConfiguration()
             setRuntimeConfig(loadedConfig)
         }
         loadConfig()
     }, [])
 
     return (
-        <RuntimeConfigurationContext.Provider value={runtimeConfig}>
+        <ConfigurationContext.Provider value={runtimeConfig}>
             {runtimeConfig ? children : <div>&nbsp;</div>}
-        </RuntimeConfigurationContext.Provider>
+        </ConfigurationContext.Provider>
     )
 }

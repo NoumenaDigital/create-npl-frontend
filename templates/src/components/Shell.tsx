@@ -21,7 +21,7 @@ import theme from '../theme.ts'
 import { useMe } from '../UserProvider'
 import { useKeycloak } from '@react-keycloak/web'
 import { SvgIconComponent } from '@mui/icons-material'
-import { useRuntimeConfiguration } from '../RuntimeConfigurationProvider'
+import { useRuntimeConfiguration } from '../ConfigurationProvider.tsx'
 import { useDirectOidc } from '../auth/DirectOidcProvider'
 
 const drawerWidth = 240

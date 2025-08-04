@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useRuntimeConfiguration } from './RuntimeConfigurationProvider.tsx'
+import { useRuntimeConfiguration } from './ConfigurationProvider.tsx'
 import { useKeycloak } from '@react-keycloak/web'
 import { Box, CircularProgress } from '@mui/material'
 import { BaseService } from './services/BaseService.ts'
