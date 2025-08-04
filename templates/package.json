@@ -1,5 +1,5 @@
 {
-    "name": "nplinit",
+    "name": "{{name}}",
     "private": true,
     "version": "0.0.1",
     "type": "module",
@@ -8,7 +8,8 @@
         "build": "tsc && vite build",
         "format": "prettier . --write",
         "format:ci": "prettier . --check",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "generate-client": "npx @hey-api/openapi-ts -i openapi/*-openapi.* -o ./src/api-client"
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",

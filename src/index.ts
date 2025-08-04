@@ -82,7 +82,7 @@ async function main() {
 
             const filesToTemplate = [
                 'package.json',
-                'public/config-noumena-cloud.json',
+                '.env',
                 'index.html'
             ];
 
